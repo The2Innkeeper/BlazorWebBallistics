@@ -1,0 +1,61 @@
+﻿@page "/ballistics"
+@using WebBallistics.Services;
+@inject ProjectileAnimationService AnimationService
+
+<svg width="800" height="600">
+    <path d="@trajectoryPath" fill="none" stroke="black" stroke-width="2" />
+    <!-- Placeholder for animated projectile, which we'll address shortly -->
+</svg>
+
+<div>
+    <input type="range" min="10" max="100" value="@AnimationService.InitialSpeed" @oninput="OnSpeedChanged" /> Initial Speed: @AnimationService.InitialSpeed m/s
+</div>
+<div>
+    <input type="range" min="1" max="90" value="@AnimationService.Angle" @oninput="OnAngleChanged" /> Angle: @AnimationService.Angle degrees
+</div>
+<div>
+    <input type="range" min="1" max="20" value="@AnimationService.Gravity" @oninput="OnGravityChanged" /> Gravity: @AnimationService.Gravity m/s^2
+</div>
+
+<button @onclick="UpdatePath">Simulate</button>
+
+@code {
+    private string trajectoryPath;
+
+    protected override void OnInitialized()
+    {
+        UpdatePath(); // Initial path generation
+    }
+
+    private void OnSpeedChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out double newSpeed))
+        {
+            AnimationService.InitialSpeed = newSpeed;
+            UpdatePath();
+        }
+    }
+
+    private void OnAngleChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out double newAngle))
+        {
+            AnimationService.Angle = newAngle;
+            UpdatePath();
+        }
+    }
+
+    private void OnGravityChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out double newGravity))
+        {
+            AnimationService.Gravity = newGravity;
+            UpdatePath();
+        }
+    }
+
+    private void UpdatePath()
+    {
+        trajectoryPath = AnimationService.CalculatePath();
+    }
+}
