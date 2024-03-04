@@ -1,61 +1,182 @@
 ﻿@page "/ballistics"
 @using WebBallistics.Services;
+@using System.Timers;
 @inject ProjectileAnimationService AnimationService
+@implements IDisposable
 
-<svg width="800" height="600">
-    <path d="@trajectoryPath" fill="none" stroke="black" stroke-width="2" />
-    <!-- Placeholder for animated projectile, which we'll address shortly -->
+<svg width="@SVG_WIDTH" height="@SVG_HEIGHT" style="border: 1px solid black;">
+    <path d="@trajectoryPath" fill="none" stroke="red" stroke-width="2"/>
+    <circle cx="@currentPosition.X" cy="@currentPosition.Y" r="5" fill="blue"/>
 </svg>
 
 <div>
-    <input type="range" min="10" max="100" value="@AnimationService.InitialSpeed" @oninput="OnSpeedChanged" /> Initial Speed: @AnimationService.InitialSpeed m/s
-</div>
-<div>
-    <input type="range" min="1" max="90" value="@AnimationService.Angle" @oninput="OnAngleChanged" /> Angle: @AnimationService.Angle degrees
-</div>
-<div>
-    <input type="range" min="1" max="20" value="@AnimationService.Gravity" @oninput="OnGravityChanged" /> Gravity: @AnimationService.Gravity m/s^2
+    <input type="range" min="1" max="60" @oninput="UpdateFrameRate" value="@frameRate" />
+    Frame Rate: @frameRate fps
 </div>
 
-<button @onclick="UpdatePath">Simulate</button>
+<div>
+    <input type="range" min="0.1" max="5" step="0.1" @oninput="UpdateTimeScale" value="@timeScale" />
+    Time scale: @timeScale
+</div>
+
+<div>
+    <input type="range" min="10" max="100" @oninput="UpdateSpeed" value="@AnimationService.InitialSpeed" /> Initial Speed: @AnimationService.InitialSpeed m/s
+</div>
+<div>
+    <input type="range" min="1" max="90" @oninput="UpdateAngle" value="@AnimationService.Angle" /> Angle: @AnimationService.Angle degrees
+</div>
+<div>
+    <input type="range" min="1" max="20" step="0.01" @oninput="UpdateGravity" value="@AnimationService.Gravity" /> Gravity: @AnimationService.Gravity m/s^2
+</div>
+<button @onclick="Simulate">Simulate</button>
 
 @code {
+    static int SVG_WIDTH = 1000;
+    static int SVG_HEIGHT = 600;
     private string trajectoryPath;
+    private List<(double X, double Y)> trajectoryPoints;
+    private (double X, double Y) currentPosition = (0, SVG_HEIGHT); // Start at the bottom of the SVG
+    private System.Timers.Timer animationTimer;
+    private int currentPointIndex = 0;
+    private List<(double X, double Y)> animationTrajectoryPoints;
+    private bool isAnimating = false;
+    private double frameRate = 50;
+    private double frameInterval = 20; // ms
+    private double timeScale = 1;
+
+    // These represent the current velocity in the x and y directions
+    private DateTime animationStartTime;
+
+
+    private void StartAnimation()
+    {
+        isAnimating = true;
+        SetupAnimationTimer();
+    }
+
+    private (double X, double Y) CalculatePositionAtTime(double elapsedTime)
+    {
+        // Physics formula to calculate position at a given time
+        double angleRad = Math.PI * AnimationService.Angle / 180.0;
+        double x = AnimationService.InitialSpeed * Math.Cos(angleRad) * elapsedTime;
+        double y = AnimationService.InitialSpeed * Math.Sin(angleRad) * elapsedTime 
+                    - 0.5 * AnimationService.Gravity * elapsedTime * elapsedTime;
+        return (x, SVG_HEIGHT - y); // Adjust for SVG coordinate system
+    }
+
+    private void UpdateProjectilePosition(object source, ElapsedEventArgs e)
+    {
+        var elapsedTime = (DateTime.Now - animationStartTime).TotalSeconds * timeScale;
+        currentPosition = CalculatePositionAtTime(elapsedTime);
+
+        if (currentPosition.Y > SVG_HEIGHT)
+        {
+            StopAnimation();
+        }
+        else
+        {
+            InvokeAsync(StateHasChanged); // Re-render the component
+        }
+    }
 
     protected override void OnInitialized()
     {
-        UpdatePath(); // Initial path generation
+        base.OnInitialized();
+        trajectoryPath = AnimationService.CalculatePath();
+        trajectoryPoints = AnimationService.CalculateTrajectory();
     }
 
-    private void OnSpeedChanged(ChangeEventArgs e)
+    private void UpdateFrameRate(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out double newRate))
+        {
+            frameRate = newRate;
+            frameInterval = 1000 / frameRate; // Calculate interval for the desired frame rate
+            if (isAnimating)
+            {
+                // Update the timer interval in real-time if the animation is running
+                SetupAnimationTimer();
+            }
+        }
+    }
+
+    private void UpdateTimeScale(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out double newTimeScale))
+        {
+            timeScale = newTimeScale;
+            RefreshTrajectory();
+        }
+    }
+
+    private void UpdateSpeed(ChangeEventArgs e)
     {
         if (double.TryParse(e.Value?.ToString(), out double newSpeed))
         {
             AnimationService.InitialSpeed = newSpeed;
-            UpdatePath();
+            RefreshTrajectory();
         }
     }
 
-    private void OnAngleChanged(ChangeEventArgs e)
+    private void UpdateAngle(ChangeEventArgs e)
     {
         if (double.TryParse(e.Value?.ToString(), out double newAngle))
         {
             AnimationService.Angle = newAngle;
-            UpdatePath();
+            RefreshTrajectory();
         }
     }
 
-    private void OnGravityChanged(ChangeEventArgs e)
+    private void UpdateGravity(ChangeEventArgs e)
     {
         if (double.TryParse(e.Value?.ToString(), out double newGravity))
         {
             AnimationService.Gravity = newGravity;
-            UpdatePath();
+            RefreshTrajectory();
         }
     }
 
-    private void UpdatePath()
+    private void Simulate()
     {
-        trajectoryPath = AnimationService.CalculatePath();
+        if (!isAnimating)
+        {
+            animationStartTime = DateTime.Now;
+            StartAnimation();
+        }
+    }
+
+    private void SetupAnimationTimer()
+    {
+        animationTimer?.Stop();
+        animationTimer?.Dispose();
+        animationTimer = new Timer(frameInterval); // This controls the frame rate
+        animationTimer.Elapsed += UpdateProjectilePosition;
+        animationTimer.AutoReset = true;
+        animationTimer.Start();
+    }
+
+    private void StopAnimation()
+    {
+        animationTimer.Stop();
+        animationTimer.Dispose();
+        animationTimer = null;
+        isAnimating = false;
+    }
+
+    // Call this method when slider values change
+    private void RefreshTrajectory()
+    {
+        if (!isAnimating)
+        {
+            trajectoryPath = AnimationService.CalculatePath();
+            trajectoryPoints = AnimationService.CalculateTrajectory();
+            StateHasChanged(); // Refresh the SVG path
+        }
+    }
+
+    public void Dispose()
+    {
+        animationTimer?.Stop();
+        animationTimer?.Dispose();
     }
 }

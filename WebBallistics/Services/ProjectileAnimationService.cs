@@ -9,12 +9,12 @@ public class ProjectileAnimationService
     public double Angle { get; set; } = 45.0; // degrees
     public double Gravity { get; set; } = 9.81; // m/s^2
 
-    public List<(double X, double Y)> CalculateTrajectory()
+    public List<(double X, double Y)> CalculateTrajectory(int pointCount = 100)
     {
         var trajectory = new List<(double X, double Y)>();
         double angleRad = Math.PI * Angle / 180.0;
         double totalTime = 2 * InitialSpeed * Math.Sin(angleRad) / Gravity;
-        double timeStep = totalTime / 100; // Divide the total time into 100 steps
+        double timeStep = totalTime / pointCount; // Divide the total time into 100 steps
 
         for (double t = 0; t <= totalTime; t += timeStep)
         {
@@ -26,9 +26,11 @@ public class ProjectileAnimationService
         return trajectory;
     }
 
+    
+
     public string CalculatePath(int pointCount = 100)
     {
-        var path = new System.Text.StringBuilder("M0,300"); // Start at middle of the SVG vertically
+        var path = new System.Text.StringBuilder(); // Start at bottom left
         double angleRad = (Math.PI / 180) * Angle;
         double totalTime = (2 * InitialSpeed * Math.Sin(angleRad)) / Gravity;
         double dt = totalTime / pointCount;
@@ -37,8 +39,16 @@ public class ProjectileAnimationService
         {
             double x = InitialSpeed * Math.Cos(angleRad) * t;
             // Invert y to accommodate SVG's top-left origin
-            double y = 300 - (InitialSpeed * Math.Sin(angleRad) * t - 0.5 * Gravity * Math.Pow(t, 2));
-            path.Append($" L{x.ToString("F2")},{y.ToString("F2")}");
+            int SVG_HEIGHT = 600;
+            double y = SVG_HEIGHT - (InitialSpeed * Math.Sin(angleRad) * t - 0.5 * Gravity * Math.Pow(t, 2));
+            if (t == 0)
+            {
+                path.AppendFormat("M {0:F2} {1:F2}", x, y);
+            }
+            else
+            {
+                path.AppendFormat(" L {0:F2} {1:F2}", x, y);
+        }
         }
 
         return path.ToString();
