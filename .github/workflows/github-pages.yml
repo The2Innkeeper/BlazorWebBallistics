@@ -1,0 +1,55 @@
+# This is ".github/workflows/gh-pages.yml" file.
+# This is an EXAMPLE of "GitHub Actions Workflow file".
+
+name: github pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v4
+
+      # Install .NET Core SDK
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Publish the site
+      # - name: Publish
+      #  REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2) 
+      #   run: dotnet publish $REPO_NAME.sln -c:Release -o:release -p:GHPages=true
+
+      # publishes Blazor project to the release-folder
+      - name: Publish .NET Core Project
+        run: |
+          REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)
+          dotnet publish $REPO_NAME.csproj -c Release -o release --nologo
+      
+      # changes the base-tag in index.html from '/' to the repository name to match GitHub Pages repository subdirectory
+      - name: Change base-tag in index.html from / to repository name
+        run: |
+          REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)
+          sed -i "s/<base href=\"\/\" \/>/<base href=\"\/$REPO_NAME\/\" \/>/g" release/wwwroot/index.html
+          
+      # copy index.html to 404.html to serve the same file when a file is not found
+      - name: copy index.html to 404.html
+        run: cp release/wwwroot/index.html release/wwwroot/404.html
+  
+      # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
+      - name: Add .nojekyll file
+        run: touch release/wwwroot/.nojekyll
+      
+      # Deploy the site
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: release/wwwroot
