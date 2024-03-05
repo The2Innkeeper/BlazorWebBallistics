@@ -5,6 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebBallistics</title>
+    <script>
+        // Check for WebAssembly support
+        if (!window.WebAssembly) {
+            // Redirect to the unsupported browser page
+            document.location.href = '/unsupported-browser';
+        }
+    </script>
     <base href="/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
