@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "WebBallistics",
   "resources": {
-    "hash": "sha256-iNHhPnFOJCjMiQbkc4TalrofQ/10q/8NA1yc2287ECQ=",
+    "hash": "sha256-Xbj/eoMo7Ej4te1WKblxFvj+PuybwisqWxU9iYm83fQ=",
     "jsModuleNative": {
       "dotnet.native.8.0.2.jgt5nhn140.js": "sha256-gPMK16QWoJSTxorlZJqcVtbBRTniIQWlLsJN2O4cJHg="
     },
@@ -51,7 +51,7 @@
       "System.Text.RegularExpressions.wasm": "sha256-W20q/uEUAv0A+F6irUkY0pCZJo76wNuWpz3XgcLFB2M=",
       "System.Threading.wasm": "sha256-4TmhC4Lm0NRFX9yCf3kXn0aHg8XyCL+hM29B5fk4ixU=",
       "System.wasm": "sha256-n7POuPtNGmUEzGtZKZtOEEpj+CuOoQ/qVWMgWhN7NXU=",
-      "WebBallistics.wasm": "sha256-Unp4uVvcKlLPCIIXRWuHj1Ns2U486XUpu9lZzYPfQKY="
+      "WebBallistics.wasm": "sha256-CaTUHt2Eo9emCODxyHPwLDwJO826/bo2gu42DnJMF5U="
     }
   },
   "cacheBootResources": true,
