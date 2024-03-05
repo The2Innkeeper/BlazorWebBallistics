@@ -79,6 +79,8 @@ public partial class BallisticsDisplay : IDisposable
         animationTimer = new(deltaTimeMS);
         animationTimer.Elapsed += UpdateProjectilePosition;
         animationTimer.AutoReset = true;
+
+        if (!isAnimating) return;
         animationTimer.Start();
     }
 
