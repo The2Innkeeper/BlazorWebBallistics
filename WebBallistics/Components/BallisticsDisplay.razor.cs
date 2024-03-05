@@ -12,13 +12,16 @@ public partial class BallisticsDisplay : IDisposable
     [Inject] private SimulationParameters Parameters { get; set; }
     [Inject] private ITrajectoryCalculationService AnimationService { get; set; }
 
-    private const int SVG_WIDTH = 1000;
-    private const int SVG_HEIGHT = 600;
+    private const int SVG_WIDTH = Configuration.SVG_WIDTH;
+    private const int SVG_HEIGHT = Configuration.SVG_HEIGHT;
     private string trajectoryPath;
     private Vector2 currentPosition = new(0, 0);
     private System.Timers.Timer animationTimer;
     private DateTime animationStartTime;
     private bool isAnimating = false;
+    private float simulationTime = 0f;
+    private float deltaTime = 0.02f;
+
 
     protected override void OnInitialized()
     {
@@ -40,7 +43,7 @@ public partial class BallisticsDisplay : IDisposable
     {
         if (!isAnimating)
         {
-            animationStartTime = DateTime.Now;
+            ResetSimulation();
             StartAnimation();
         }
     }
@@ -51,29 +54,47 @@ public partial class BallisticsDisplay : IDisposable
         SetupAnimationTimer();
     }
 
+    private void StopAnimation()
+    {
+        animationTimer.Stop();
+        animationTimer.Dispose();
+        animationTimer = null;
+        isAnimating = false;
+        ResetSimulation(); // Reset the simulation when stopping
+    }
+
+    private void ResetSimulation()
+    {
+        simulationTime = 0f; // Reset the simulation time
+        currentPosition = CartesianToSvgCoordinates(new Vector2(0, 0));
+        RefreshTrajectory(); // Recalculate the trajectory path
+    }
+
     private void SetupAnimationTimer()
     {
         animationTimer?.Stop();
         animationTimer?.Dispose();
-        animationTimer = new(1000 / Parameters.FrameRate);
+        deltaTime = 1f / Parameters.FrameRate;
+        animationTimer = new(deltaTime);
         animationTimer.Elapsed += UpdateProjectilePosition;
         animationTimer.AutoReset = true;
         animationTimer.Start();
     }
 
     // Converts a point from Cartesian coordinates to SVG coordinates
-    private Vector2 ConvertToSvgCoordinates(Vector2 cartesianPoint)
+    private Vector2 CartesianToSvgCoordinates(Vector2 cartesianPoint)
     {
         return new Vector2(cartesianPoint.X, SVG_HEIGHT - cartesianPoint.Y);
     }
+    
 
     private void UpdateProjectilePosition(object source, ElapsedEventArgs e)
     {
-        float elapsedTime = (float)((DateTime.Now - animationStartTime).TotalSeconds * Parameters.TimeScale);
-        Vector2 cartesianPosition = AnimationService.CalculatePositionAtTime(elapsedTime, Parameters);
-        currentPosition = ConvertToSvgCoordinates(cartesianPosition);
+        simulationTime += deltaTime * Parameters.TimeScale;
+        Vector2 newCartesianPosition = AnimationService.CalculatePositionAtTime(simulationTime, Parameters);
+        currentPosition = CartesianToSvgCoordinates(newCartesianPosition);
 
-        if (cartesianPosition.Y <= 0 || cartesianPosition.X >= SVG_WIDTH)
+        if (newCartesianPosition.Y < 0 || newCartesianPosition.X > SVG_WIDTH)
         {
             StopAnimation();
         }
@@ -83,13 +104,7 @@ public partial class BallisticsDisplay : IDisposable
         }
     }
 
-    private void StopAnimation()
-    {
-        animationTimer.Stop();
-        animationTimer.Dispose();
-        animationTimer = null;
-        isAnimating = false;
-    }
+
 
     public void Dispose()
     {

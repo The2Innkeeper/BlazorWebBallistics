@@ -1,5 +1,6 @@
 // File: Services/TrajectoryCalculationService.cs
 using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using WebBallistics.Models;
 
@@ -7,11 +8,12 @@ namespace WebBallistics.Services;
 
 public class TrajectoryCalculationService_ClosedSystem : ITrajectoryCalculationService
 {
-    public Vector2 CalculatePositionAtTime(float elapsedTime, SimulationParameters parameters)
+    public Vector2 CalculatePositionAtTime(float simulationTime, SimulationParameters parameters)
     {
         float angleRad = MathF.PI * parameters.Angle / 180f;
-        float x = parameters.InitialSpeed * MathF.Cos(angleRad) * elapsedTime;
-        float y = parameters.InitialSpeed * MathF.Sin(angleRad) * elapsedTime - 0.5f * parameters.Gravity * elapsedTime * elapsedTime;
+        float x = parameters.InitialSpeed * MathF.Cos(angleRad) * simulationTime;
+        float y = parameters.InitialSpeed * MathF.Sin(angleRad) * simulationTime - 0.5f * parameters.Gravity * simulationTime * simulationTime;
+
         return new Vector2(x, y);
     }
 
