@@ -15,7 +15,7 @@ public partial class BallisticsDisplay : IDisposable
     private const int SVG_WIDTH = Configuration.SVG_WIDTH;
     private const int SVG_HEIGHT = Configuration.SVG_HEIGHT;
     private string trajectoryPath;
-    private Vector2 currentPosition = new(SVG_HEIGHT, 0);
+    private Vector2 currentPosition = new(0, SVG_HEIGHT);
     private System.Timers.Timer animationTimer;
     private DateTime animationStartTime;
     private bool isAnimating = false;
