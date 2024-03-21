@@ -1,4 +1,4 @@
-namespace WebBallistics;
+namespace OldWebBallistics;
 
 public static class Configuration
 {

@@ -2,9 +2,9 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using WebBallistics.Models;
+using OldWebBallistics.Models;
 
-namespace WebBallistics.Services;
+namespace OldWebBallistics.Services;
 
 public class TrajectoryCalculationService_ClosedSystem : ITrajectoryCalculationService
 {
@@ -20,7 +20,7 @@ public class TrajectoryCalculationService_ClosedSystem : ITrajectoryCalculationS
     public string CalculatePath(SimulationParameters parameters, int pointCount = 100)
     {
         var path = new StringBuilder();
-        float angleRad = (MathF.PI / 180f ) * parameters.Angle;
+        float angleRad = (MathF.PI / 180f) * parameters.Angle;
         float totalTime = (2f * parameters.InitialSpeed * MathF.Sin(angleRad)) / parameters.Gravity;
         float dt = totalTime / pointCount;
         int SVG_HEIGHT = 600;

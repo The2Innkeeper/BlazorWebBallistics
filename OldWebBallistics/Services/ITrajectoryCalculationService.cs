@@ -1,8 +1,8 @@
 // File: Services/ITrajectoryCalculationService.cs
 using System;
-using WebBallistics.Models;
+using OldWebBallistics.Models;
 
-namespace WebBallistics.Services;
+namespace OldWebBallistics.Services;
 
 public interface ITrajectoryCalculationService
 {
