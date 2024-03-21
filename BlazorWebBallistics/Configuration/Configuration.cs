@@ -1,4 +1,4 @@
-namespace OldWebBallistics;
+namespace BlazorWebBallistics;
 
 public static class Configuration
 {

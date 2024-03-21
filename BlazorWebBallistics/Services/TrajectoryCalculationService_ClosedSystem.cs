@@ -2,9 +2,9 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using OldWebBallistics.Models;
+using BlazorWebBallistics.Models;
 
-namespace OldWebBallistics.Services;
+namespace BlazorWebBallistics.Services;
 
 public class TrajectoryCalculationService_ClosedSystem : ITrajectoryCalculationService
 {

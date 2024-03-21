@@ -1,6 +1,6 @@
 using System;
 
-namespace OldWebBallistics.Models;
+namespace BlazorWebBallistics.Models;
 
 public class SimulationParameters
 {

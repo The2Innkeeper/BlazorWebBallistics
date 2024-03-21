@@ -1,4 +1,4 @@
-namespace OldWebBallistics.Models;
+namespace BlazorWebBallistics.Models;
 
 public struct Vector2(float x, float y)
 {

@@ -2,11 +2,11 @@
 using System;
 using System.Timers;
 using Microsoft.AspNetCore.Components;
-using OldWebBallistics.Models;
-using OldWebBallistics.Services;
-using OldWebBallistics.Helpers;
+using BlazorWebBallistics.Models;
+using BlazorWebBallistics.Services;
+using BlazorWebBallistics.Helpers;
 
-namespace OldWebBallistics.Components;
+namespace BlazorWebBallistics.Components;
 
 public partial class BallisticsDisplay : IDisposable
 {

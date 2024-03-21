@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using OldWebBallistics;
-using OldWebBallistics.Models;
-using OldWebBallistics.Services;
+using BlazorWebBallistics;
+using BlazorWebBallistics.Models;
+using BlazorWebBallistics.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

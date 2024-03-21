@@ -1,6 +1,6 @@
-using OldWebBallistics.Models;
+using BlazorWebBallistics.Models;
 
-namespace OldWebBallistics.Helpers;
+namespace BlazorWebBallistics.Helpers;
 
 public static class CoordinateConverter
 {
