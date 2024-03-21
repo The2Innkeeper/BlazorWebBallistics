@@ -30,7 +30,7 @@ jobs:
       - name: Publish .NET Core Project
         run: |
           REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)
-          dotnet publish $REPO_NAME/OldWebBallistics.csproj -c Release -o release --nologo
+          dotnet publish OldWebBallistics/OldWebBallistics.csproj -c Release -o release --nologo
       
       # changes the base-tag in index.html from '/' to the repository name to match GitHub Pages repository subdirectory
       - name: Change base-tag in index.html from / to repository name
