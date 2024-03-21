@@ -1,6 +1,6 @@
 using System;
 
-namespace WebBallistics.Models;
+namespace OldWebBallistics.Models;
 
 public class SimulationParameters
 {

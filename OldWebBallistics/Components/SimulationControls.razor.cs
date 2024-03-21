@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using WebBallistics.Models;
+using OldWebBallistics.Models;
 
-namespace WebBallistics.Components;
+namespace OldWebBallistics.Components;
 
 public partial class SimulationControls
 {

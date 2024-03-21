@@ -1,6 +1,6 @@
-using WebBallistics.Models;
+using OldWebBallistics.Models;
 
-namespace WebBallistics.Helpers;
+namespace OldWebBallistics.Helpers;
 
 public static class CoordinateConverter
 {

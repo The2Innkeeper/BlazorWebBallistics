@@ -1,9 +1,0 @@
-@using WebBallistics.Models
-@using WebBallistics.Services
-
-<svg width="@SVG_WIDTH" height="@SVG_HEIGHT" style="border: 1px solid black;">
-    <path d="@trajectoryPath" fill="none" stroke="red" stroke-width="2"/>
-    <circle cx="@currentPosition.X" cy="@currentPosition.Y" r="5" fill="blue"/>
-</svg>
-
-<button @onclick="Simulate">Simulate</button>
